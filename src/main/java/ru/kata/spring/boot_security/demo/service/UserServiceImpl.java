@@ -37,6 +37,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return userRepository.findByUsername(username);
     }
 
+
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -63,8 +64,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     @Transactional
-    public void save(User user) {
+    public void save(User user,Set<Long> roleIds) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRoles(roleService.getRolesByIds(roleIds));
         userRepository.save(user);
     }
 

@@ -50,21 +50,21 @@ public class AdminControllers {
 
 
     @GetMapping("/new")
-    public String newUser(@ModelAttribute("user") User user) {
+    public String newUser(@ModelAttribute("user") User user,Model model) {
+        model.addAttribute("allRoles", roleService.getAllRoles());
         return "admin/new";
     }
 
 
     @PostMapping()
     public String create(@ModelAttribute("user") @Valid User user,
-                         BindingResult bindingResult, Model model) {
-
+                         BindingResult bindingResult, @RequestParam Set<Long> roleIds, Model model) {
+        model.addAttribute("allRoles", roleService.getAllRoles());
         if (bindingResult.hasErrors()) {
             model.addAttribute("user", user);
             return "admin/new";
         }
-
-        userService.save(user);
+        userService.save(user, roleIds);
         return "redirect:/admin";
     }
 
@@ -84,7 +84,7 @@ public class AdminControllers {
 
     @PostMapping("/update")
     public String update(@ModelAttribute("user") @Valid User user,
-                         BindingResult bindingResult, @RequestParam("id") Long id,@RequestParam Set<Long> roleIds) {
+                         BindingResult bindingResult, @RequestParam("id") Long id, @RequestParam Set<Long> roleIds) {
         if (bindingResult.hasErrors())
             return "admin/edit";
 
@@ -98,6 +98,5 @@ public class AdminControllers {
         userService.delete(id);
         return "redirect:/admin";
     }
-
 
 }

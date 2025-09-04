@@ -157,6 +157,23 @@
                             </div>
                         </div>
 
+                        <div class="mb-4">
+                            <label class="form-label">
+                                <i class="fas fa-shield-alt me-1"></i>Roles
+                            </label>
+                            <div class="roles-container">
+                                <div th:each="role : ${allRoles}" class="form-check">
+                                    <input class="form-check-input role-checkbox"
+                                           type="checkbox"
+                                           th:value="${role.id}"
+                                           th:id="'role_' + ${role.id}"
+                                           name="roleIds"
+                                           th:checked="${selectedRoleIds != null and selectedRoleIds.contains(role.id)}">
+                                    <label class="form-check-label" th:for="'role_' + ${role.id}"
+                                           th:text="${role.name}">Role</label>
+                                </div>
+                            </div>
+                        </div>
 
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary btn-lg">

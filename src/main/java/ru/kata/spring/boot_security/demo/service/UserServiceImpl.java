@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.model.Role;
@@ -17,12 +18,19 @@ import java.util.Set;
 
 @Service
 public class UserServiceImpl implements UserService, UserDetailsService {
+
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final RoleService roleService;
+    private final RoleRepository roleRepository;
 
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, RoleService roleService, RoleRepository roleRepository) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.roleService = roleService;
+        this.roleRepository = roleRepository;
     }
 
     public User findByUsername(String username) {
@@ -56,19 +64,20 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     @Transactional
     public void save(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }
 
 
     @Override
     @Transactional
-    public void update(Long id, User updatedUser) {
+    public void update(Long id, User updatedUser, Set<Long> roleIds) {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
         existingUser.setUsername(updatedUser.getUsername());
         existingUser.setAge(updatedUser.getAge());
-        existingUser.setPassword(updatedUser.getPassword());
-        existingUser.setRoles(updatedUser.getRoles());
+        existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+        existingUser.setRoles(roleService.getRolesByIds(roleIds));
 
         userRepository.save(existingUser);
     }
@@ -79,11 +88,5 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         userRepository.deleteById(id);
     }
 
-//    @Override
-//    @Transactional
-//    public void addRoleToUser(Long userId, String role) {
-//        User user = userRepository.findById(userId).orElseThrow();
-//        user.getRoles().add(roleRepository.findByName(role));
-//        userRepository.save(user);
-//    }
+
 }

@@ -5,38 +5,46 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
+import ru.kata.spring.boot_security.demo.service.RoleService;
+import ru.kata.spring.boot_security.demo.service.RoleServiceImpl;
+import ru.kata.spring.boot_security.demo.service.UserService;
 import ru.kata.spring.boot_security.demo.service.UserServiceImpl;
 
 import javax.validation.Valid;
+import java.util.Collection;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/admin")
 public class AdminControllers {
 
-    private final UserServiceImpl userServiceImpl;
+    private final UserService userService;
+    private final RoleService roleService;
 
     @Autowired
-    public AdminControllers(UserServiceImpl userServiceImpl) {
-        this.userServiceImpl = userServiceImpl;
+    public AdminControllers(UserService userService, RoleServiceImpl roleService) {
+        this.userService = userService;
+        this.roleService = roleService;
     }
 
 
     @GetMapping()
     public String index(Model model) {
-        model.addAttribute("people", userServiceImpl.index());
+        model.addAttribute("people", userService.index());
         return "admin/index";
     }
 
 
     @GetMapping("/show")
     public String show(@RequestParam("id") Long id, Model model) {
-        User user = userServiceImpl.show(id);
+        User user = userService.show(id);
         if (user == null) {
             model.addAttribute("errorMessage", "User not found with id: " + id);
             return "redirect:/admin";
         }
-        model.addAttribute("user", userServiceImpl.show(id));
+        model.addAttribute("user", userService.show(id));
         return "admin/show";
     }
 
@@ -56,35 +64,38 @@ public class AdminControllers {
             return "admin/new";
         }
 
-        userServiceImpl.save(user);
+        userService.save(user);
         return "redirect:/admin";
     }
 
 
     @GetMapping("/edit")
     public String edit(@RequestParam("id") Long id, Model model) {
-        User user = userServiceImpl.show(id);
+        User user = userService.show(id);
         if (user == null) {
             model.addAttribute("errorMessage", "User not found with id: " + id);
             return "redirect:/admin";
         }
+        model.addAttribute("allRoles", roleService.getAllRoles());
         model.addAttribute("user", user);
         return "admin/edit";
     }
 
+
     @PostMapping("/update")
     public String update(@ModelAttribute("user") @Valid User user,
-                         BindingResult bindingResult, @RequestParam("id") Long id) {
+                         BindingResult bindingResult, @RequestParam("id") Long id,@RequestParam Set<Long> roleIds) {
         if (bindingResult.hasErrors())
             return "admin/edit";
 
-        userServiceImpl.update(id, user);
+        userService.update(id, user, roleIds);
         return "redirect:/admin";
     }
 
+
     @PostMapping("/delete")
     public String delete(@RequestParam("id") Long id) {
-        userServiceImpl.delete(id);
+        userService.delete(id);
         return "redirect:/admin";
     }
 

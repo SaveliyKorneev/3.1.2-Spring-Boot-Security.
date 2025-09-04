@@ -16,10 +16,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserServiceImpl userServiceImpl;
     private final SuccessUserHandler successUserHandler;
+    private final PasswordEncoder passwordEncoder;
 
-    public WebSecurityConfig(UserServiceImpl userServiceImpl, SuccessUserHandler successUserHandler) {
+    public WebSecurityConfig(UserServiceImpl userServiceImpl, SuccessUserHandler successUserHandler, PasswordEncoder passwordEncoder) {
         this.userServiceImpl = userServiceImpl;
         this.successUserHandler = successUserHandler;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -45,15 +47,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll();
     }
 
-    @Bean
-    public PasswordEncoder getPasswordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 
     @Bean
     public DaoAuthenticationProvider daoAuthenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setPasswordEncoder(getPasswordEncoder());
+        authenticationProvider.setPasswordEncoder(passwordEncoder);
         authenticationProvider.setUserDetailsService(userServiceImpl);
         return authenticationProvider;
     }

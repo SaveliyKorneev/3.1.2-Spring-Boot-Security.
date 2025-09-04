@@ -13,13 +13,13 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class Initializer {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
 
-    @Autowired
+   // @Autowired
     public Initializer(UserRepository userRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;

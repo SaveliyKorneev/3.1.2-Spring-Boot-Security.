@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Registration</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            width: 100%;
+            max-width: 450px;
+        }
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            border: none;
+            padding: 20px;
+            text-align: center;
+        }
+        .form-control {
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+            padding: 12px;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .error-message {
+            color: #dc3545;
+            font-size: 0.875em;
+            margin-top: 5px;
+            font-weight: 500;
+        }
+        .is-invalid {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+        }
+        .required-field::after {
+            content: " *";
+            color: #dc3545;
+        }
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+        .login-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+        }
+        .login-link:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+        .password-toggle {
+            cursor: pointer;
+            color: #667eea;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        .card-body {
+            padding: 30px;
+        }
+        .input-group {
+            position: relative;
+        }
+        .password-toggle-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #6c757d;
+            cursor: pointer;
+            z-index: 5;
+        }
+        .success-message {
+            color: #28a745;
+            font-size: 0.875em;
+            margin-top: 5px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0"><i class="fas fa-user-plus me-2"></i>Create Account</h3>
+                </div>
+                <div class="card-body">
+                    <form th:method="POST" th:action="@{/user/registration}" th:object="${user}">
+
+
+                        <div class="mb-3">
+                            <label for="username" class="form-label required-field">
+                                <i class="fas fa-user me-1"></i>Username
+                            </label>
+                            <input type="text" class="form-control"
+                                   th:classappend="${#fields.hasErrors('username')} ? 'is-invalid' : ''"
+                                   th:field="*{username}"
+                                   id="username"
+                                   placeholder="Enter username (2-30 characters)"
+                                   required
+                                   autocomplete="username"/>
+                            <div class="error-message" th:if="${#fields.hasErrors('username')}"
+                                 th:errors="*{username}">Username error</div>
+                            <small class="text-muted">2-30 characters, letters, spaces, hyphens and apostrophes only</small>
+                        </div>
+
+
+                        <div class="mb-3">
+                            <label for="age" class="form-label required-field">
+                                <i class="fas fa-birthday-cake me-1"></i>Age
+                            </label>
+                            <input type="number" class="form-control"
+                                   th:classappend="${#fields.hasErrors('age')} ? 'is-invalid' : ''"
+                                   th:field="*{age}"
+                                   id="age"
+                                   placeholder="Enter age (0-150)"
+                                   min="0" max="150"
+                                   required
+                                   autocomplete="off"/>
+                            <div class="error-message" th:if="${#fields.hasErrors('age')}"
+                                 th:errors="*{age}">Age error</div>
+                            <small class="text-muted">Must be between 0 and 150 years</small>
+                        </div>
+
+
+                        <div class="mb-4">
+                            <label for="password" class="form-label required-field">
+                                <i class="fas fa-lock me-1"></i>Password
+                            </label>
+                            <div class="input-group">
+                                <input type="password" class="form-control"
+                                       th:classappend="${#fields.hasErrors('password')} ? 'is-invalid' : ''"
+                                       th:field="*{password}"
+                                       id="password"
+                                       placeholder="Enter password (min 4 characters)"
+                                       required
+                                       autocomplete="new-password"/>
+                                <button type="button" class="password-toggle-btn"
+                                        onclick="togglePassword()">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="error-message" th:if="${#fields.hasErrors('password')}"
+                                 th:errors="*{password}">Password error</div>
+                            <small class="text-muted">Password must be at least 4 characters long</small>
+                        </div>
+
+
+                        <div class="mb-3" th:if="${param.success}">
+                            <div class="success-message text-center">
+                                <i class="fas fa-check-circle me-1"></i>
+                                Registration successful! Please login.
+                            </div>
+                        </div>
+
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-user-plus me-2"></i>Create Account
+                            </button>
+                        </div>
+
+                        <!-- Login Link -->
+                        <a th:href="@{/user/login}" class="login-link">
+                            <i class="fas fa-sign-in-alt me-1"></i>Already have an account? Login here
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function togglePassword() {
+        const passwordField = document.getElementById('password');
+        const toggleBtn = document.querySelector('.password-toggle-btn i');
+
+        if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+            toggleBtn.classList.remove('fa-eye');
+            toggleBtn.classList.add('fa-eye-slash');
+        } else {
+            passwordField.type = 'password';
+            toggleBtn.classList.remove('fa-eye-slash');
+            toggleBtn.classList.add('fa-eye');
+        }
+    }
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('username').focus();
+    });
+</script>
+</body>
+</html>
